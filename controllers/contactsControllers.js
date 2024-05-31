@@ -6,6 +6,10 @@ import {
   updateContactById,
 } from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
+import {
+  createContactSchema,
+  updateContactSchema,
+} from "../schemas/contactsSchemas.js";
 
 export const getAllContacts = async (req, res) => {
   try {
@@ -41,26 +45,56 @@ export const deleteContact = async (req, res, next) => {
 };
 
 export const createContact = async (req, res) => {
-  const { name, email, phone } = req.body;
   try {
-    const contact = await addContact(name, email, phone);
-    res.status(201).json(contact);
-  } catch (err) {
-    console.log(err);
+    const contact = {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    };
+
+    const { error } = createContactSchema.validate(contact, {
+      convert: false,
+    });
+    if (typeof error !== "undefined") {
+      return res.status(400).json({ message: error.message });
+    }
+
+    const { name, email, phone } = req.body;
+    const newContact = await addContact(name, email, phone);
+    res.status(201).json(newContact);
+  } catch (error) {
+    console.error("Error: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-export const updateContact = async (req, res, next) => {
+export const updateContact = async (req, res) => {
   try {
-    if (!Object.keys(req.body).length) {
-      throw HttpError(400, "Body must have at least one field");
+    const { id } = req.params;
+    const infoToUpdate = req.body;
+
+    if (Object.keys(infoToUpdate).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Body must have at least one field" });
     }
-    const newContact = await updateContactById(req.params.id, req.body);
-    if (!newContact) {
-      throw HttpError(404, "Not found");
+
+    const { error } = updateContactSchema.validate(infoToUpdate, {
+      convert: false,
+    });
+    if (error) {
+      return res.status(400).json({ message: error.message });
     }
-    res.status(200).json(newContact);
-  } catch (err) {
-    next(err);
+
+    const updatedContact = await updateContactById(id, infoToUpdate);
+
+    if (!updatedContact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    console.error("Error: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
