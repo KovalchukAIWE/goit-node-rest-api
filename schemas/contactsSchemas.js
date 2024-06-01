@@ -6,6 +6,7 @@ export const createContactSchema = Joi.object({
     .required()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
   phone: Joi.string().required().min(7).max(12),
+  favorite: Joi.boolean().required(),
 });
 
 export const updateContactSchema = Joi.object({
@@ -14,8 +15,9 @@ export const updateContactSchema = Joi.object({
     .optional()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
   phone: Joi.string().optional().min(7).max(12),
+  favorite: Joi.boolean(),
 });
 
-export const updateFavoriteInContact = Joi.object({
+export const updateStatusSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
