@@ -19,5 +19,5 @@ export const updateContactSchema = Joi.object({
 });
 
 export const updateStatusSchema = Joi.object({
-  favorite: Joi.boolean().required(),
+  favorite: Joi.boolean(),
 });
