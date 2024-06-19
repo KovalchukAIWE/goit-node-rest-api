@@ -1,43 +1,33 @@
 import express from "express";
 import contactsControllers from "../controllers/contactsControllers.js";
-import isBodyEmpty from "../middlewares/isBodyEmpty.js";
-import validateBody from "../decorators/validateBody.js";
-import {
-  createContactSchema,
-  updateContactSchema,
-  updateStatusSchema,
-} from "../schemas/contactsSchemas.js";
+import isEmptyBody from "../middlewares/isEmptyBody.js";
+import authenticate from "../middlewares/authenticate.js";
 import isValidID from "../middlewares/isValidId.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", contactsControllers.getAll);
+contactsRouter.use(authenticate);
+
+contactsRouter.get("/", contactsControllers.getAllContacts);
 
 contactsRouter.get("/:id", isValidID, contactsControllers.getOneContact);
 
 contactsRouter.delete("/:id", isValidID, contactsControllers.deleteContact);
 
-contactsRouter.post(
-  "/",
-  validateBody(createContactSchema),
-  isBodyEmpty,
-  contactsControllers.createContact
-);
+contactsRouter.post("/", isEmptyBody, contactsControllers.createContact);
 
 contactsRouter.put(
   "/:id",
   isValidID,
-  validateBody(updateContactSchema),
-  isBodyEmpty,
+  isEmptyBody,
   contactsControllers.updateContact
 );
 
 contactsRouter.patch(
   "/:id/favorite",
   isValidID,
-  isBodyEmpty,
-  validateBody(updateStatusSchema),
-  contactsControllers.updateContactStatus
+  isEmptyBody,
+  contactsControllers.updateContact
 );
 
 export default contactsRouter;
