@@ -22,6 +22,7 @@ app.use(express.json());
 
 app.use("/users", authRouter);
 app.use("/api/contacts", contactsRouter);
+app.use("/avatars", express.static("public/avatars"));
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
