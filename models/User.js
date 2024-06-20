@@ -23,7 +23,16 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
-    avatarURL: String,
+    avatarURL: {
+      type: String,
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -33,6 +42,8 @@ userSchema.post("save", handleSaveError);
 userSchema.pre("findOneAndUpdate", setUpdateSettings);
 
 userSchema.post("findOneAndUpdate", handleSaveError);
+
+userSchema.post("remove", handleSaveError);
 
 const User = model("user", userSchema);
 
